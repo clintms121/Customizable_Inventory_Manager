@@ -8,42 +8,24 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
 
-
-<HBox fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="592.0" prefWidth="793.0" styleClass="container" stylesheets="@css/background.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<HBox fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="592.0" prefWidth="793.0" styleClass="speed-builder-hbox" stylesheets="@css/style.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <VBox prefHeight="592.0" prefWidth="200.0">
+      <VBox prefHeight="546.0" prefWidth="209.0">
          <children>
             <AnchorPane fx:id="side_ankerpane" prefHeight="593.0" prefWidth="200.0" styleClass="side_ankerpane" stylesheets="@css/style.css">
                <children>
-                  <Pane fx:id="inner_pane" layoutX="5.0" layoutY="22.0" prefHeight="51.0" prefWidth="200.0" styleClass="inner_pane">
+                  <Pane layoutX="5.0" layoutY="382.0" prefHeight="200.0" prefWidth="200.0">
                      <children>
-                        <ImageView fitHeight="51.0" fitWidth="46.0" layoutX="14.0" layoutY="3.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@imgs/boxes.png" />
-                           </image>
-                        </ImageView>
-                        <Pane fx:id="most_inner_pane" layoutX="148.0" prefHeight="51.0" prefWidth="38.0" styleClass="most_inner_pane">
-                           <children>
-                              <ImageView fitHeight="90.0" fitWidth="46.0" layoutX="-4.0" layoutY="3.0" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@imgs/dots.png" />
-                                 </image>
-                              </ImageView>
-                           </children>
-                        </Pane>
-                     </children>
-                  </Pane>
-                  <Pane layoutX="5.0" layoutY="392.0" prefHeight="200.0" prefWidth="200.0">
-                     <children>
-                        <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="25.0" layoutY="25.0" pickOnBounds="true" preserveRatio="true">
+                        <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="36.0" layoutY="25.0" pickOnBounds="true" preserveRatio="true">
                            <image>
                               <Image url="@imgs/boxes.png" />
                            </image>
                         </ImageView>
                      </children>
                   </Pane>
-                  <Button fx:id="btn_create" layoutX="13.0" layoutY="279.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="183.0" styleClass="btn_create" stylesheets="@css/style.css" text="Create" textFill="WHITE">
+                  <Button fx:id="newButton" layoutX="22.0" layoutY="275.0" mnemonicParsing="false" onAction="#onNewButtonClicked" prefHeight="39.0" prefWidth="183.0" styleClass="btn_create" stylesheets="@css/style.css" text="New" textFill="WHITE">
                      <font>
                         <Font name="Century Gothic Bold" size="12.0" />
                      </font>
@@ -55,6 +37,43 @@
                         </ImageView>
                      </graphic>
                   </Button>
+                  <Button fx:id="loadButton" layoutX="23.0" layoutY="314.0" mnemonicParsing="false" onAction="#onLoadButtonClicked" prefHeight="39.0" prefWidth="183.0" styleClass="btn_load" stylesheets="@css/style.css" text="Load" textFill="WHITE">
+                     <font>
+                        <Font name="Century Gothic Bold" size="12.0" />
+                     </font>
+                     <graphic>
+                        <ImageView fitHeight="17.0" fitWidth="17.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../../../../../../../../../../../Downloads/plus.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </Button>
+                  <Text fill="WHITE" fontSmoothingType="LCD" layoutX="15.0" layoutY="36.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="title" text="Easy Inventory" textAlignment="CENTER" wrappingWidth="200.0">
+                     <font>
+                        <Font name="Copperplate Gothic Bold" size="25.0" />
+                     </font>
+                  </Text>
+                  <ImageView fitHeight="39.0" fitWidth="34.0" layoutX="14.0" layoutY="141.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@imgs/icons8-github-48.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fitHeight="93.0" fitWidth="38.0" layoutX="12.0" layoutY="189.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@imgs/icons8-linkedin-48.png" />
+                     </image>
+                  </ImageView>
+                  <Text fill="WHITE" fontSmoothingType="LCD" layoutX="5.0" layoutY="165.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="title" text="        Clintms121" textAlignment="CENTER" wrappingWidth="183.0">
+                     <font>
+                        <Font name="Copperplate Gothic Bold" size="19.0" />
+                     </font>
+                  </Text>
+                  <Text fill="WHITE" fontSmoothingType="LCD" layoutX="48.0" layoutY="216.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="title" text="Clint Stapleton" textAlignment="CENTER" wrappingWidth="183.0">
+                     <font>
+                        <Font name="Copperplate Gothic Bold" size="19.0" />
+                     </font>
+                  </Text>
                </children>
             </AnchorPane>
          </children>

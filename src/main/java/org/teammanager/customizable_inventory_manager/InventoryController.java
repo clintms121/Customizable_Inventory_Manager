@@ -1,5 +1,6 @@
 package org.teammanager.customizable_inventory_manager;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -8,8 +9,6 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.stream.Collectors;
 
@@ -17,10 +16,10 @@ import java.util.stream.Collectors;
 public class InventoryController {
 
     @Autowired
-    private InventoryItemRepository inventoryItemRepository;
+    private InventoryService inventoryService; // Service Layer
 
     @FXML
-    private Button addButton; //declare button
+    private Button addButton;
 
     @FXML
     private TableView<InventoryItem> inventoryTable;
@@ -48,54 +47,64 @@ public class InventoryController {
 
     @FXML
     private void initialize() {
-        DatabaseConnection.testConnection();
-       // initalizing buttons, tables
+        // Configure TableView Columns
+        configureTableColumns();
+
+        // Set button actions
         addButton.setOnAction(e -> addItem());
 
-        //set up the columns in the table view
+        // Load the initial items
+        loadInventoryItems();
+
+        // Populate category combo box
+        populateCategoryComboBox();
+    }
+
+    private void configureTableColumns() {
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
         categoryColumn.setCellValueFactory(new PropertyValueFactory<>("category"));
         quantityColumn.setCellValueFactory(new PropertyValueFactory<>("quantity"));
         priceColumn.setCellValueFactory(new PropertyValueFactory<>("price"));
-
-        //load inventory items into the table
-        loadInventoryItems();
     }
 
-    //private helper method to load inventory items into the table
     private void loadInventoryItems() {
-        ObservableList<InventoryItem> items = FXCollections.observableArrayList(inventoryItemRepository.findAll());
+        ObservableList<InventoryItem> items = inventoryService.getAllItems();
+        setTableData(items);
+    }
 
-        //set items in the tableview
-        inventoryTable.setItems(items);
+    private void populateCategoryComboBox() {
+        // Load all unique categories for the dropdown
+        categoryComboBox.setItems(FXCollections.observableArrayList(inventoryService.getAllCategories()));
+    }
+
+    private void setTableData(ObservableList<InventoryItem> items) {
+        Platform.runLater(() -> {
+            if (inventoryTable != null) {
+                if (items != null && !items.isEmpty()) {
+                    inventoryTable.setItems(items);
+                } else {
+                    inventoryTable.getItems().clear();
+                    inventoryTable.setPlaceholder(new Label("No data available"));
+                }
+            }
+        });
     }
 
     @FXML
-    private void addItem(){
-        //logic for adding an inventory item
-        InventoryItem item = new InventoryItem();
-        item.setName("Sample Item");
-        item.setCategory("Category A");
-        item.setQuantity(10);
-        item.setPrice(100.0);
-        inventoryItemRepository.save(item);
+    private void addItem() {
+        InventoryItem newItem = inventoryService.createSampleItem(); // Generic item creation
+        inventoryService.saveItem(newItem);
+        loadInventoryItems(); // Refresh table
+        AlertUtil.showInfo("Item Added", "A new sample item has been added successfully.");
     }
 
     @FXML
-    private void editItem () {
+    private void editItem() {
         InventoryItem selectedItem = inventoryTable.getSelectionModel().getSelectedItem();
         if (selectedItem != null) {
-            //open an edit form with the current values populated in the fields
-            selectedItem.setName("Updated Item Name");
-            selectedItem.setCategory("Updated Category");
-            selectedItem.setQuantity(15);
-            selectedItem.setPrice(200.0);
-
-            //save updated item back to the database
-            inventoryItemRepository.save(selectedItem);
-
-            //refresh table
+            inventoryService.updateSampleItem(selectedItem); // Edit existing item
             loadInventoryItems();
+            AlertUtil.showInfo("Item Updated", "The selected item has been updated.");
         }
     }
 
@@ -103,59 +112,50 @@ public class InventoryController {
     private void deleteItem() {
         InventoryItem selectedItem = inventoryTable.getSelectionModel().getSelectedItem();
         if (selectedItem != null) {
-            //delete item from database
-            inventoryItemRepository.delete(selectedItem);
-
-            //Refresh table
-            loadInventoryItems();
+            inventoryService.deleteItem(selectedItem);
+            loadInventoryItems(); // Refresh table
+            AlertUtil.showInfo("Item Deleted", "The selected item has been deleted.");
         }
     }
 
     @FXML
     private void searchInventory() {
-        String searchTerm = searchTextField.getText().toLowerCase();
-        ObservableList<InventoryItem> filteredItems = FXCollections.observableArrayList(
-                inventoryItemRepository.findAll().stream()
-                        .filter(item -> item.getName().toLowerCase().contains(searchTerm))
-                        .collect(Collectors.toList())
-        );
-        inventoryTable.setItems(filteredItems);
+        String searchTerm = searchTextField.getText();
+        ObservableList<InventoryItem> filteredItems = inventoryService.searchItems(searchTerm);
+        setTableData(filteredItems);
     }
 
     @FXML
     private void filterByCategory() {
         String selectedCategory = categoryComboBox.getValue();
-        ObservableList<InventoryItem> filteredItems = FXCollections.observableArrayList(
-                inventoryItemRepository.findAll().stream()
-                        .filter(item -> item.getCategory().equals(selectedCategory))
-                        .collect(Collectors.toList())
-        );
-        inventoryTable.setItems(filteredItems);
+        ObservableList<InventoryItem> filteredItems = inventoryService.getItemsByCategory(selectedCategory);
+        setTableData(filteredItems);
     }
 
     @FXML
     private void generateReport() {
-        ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList();
-
-        inventoryItemRepository.findAll().stream()
-                .collect(Collectors.groupingBy(InventoryItem::getCategory, Collectors.counting()))
-                .forEach((category, count) -> pieChartData.add(new PieChart.Data(category, count)));
-
-        stockPieChart.setData(pieChartData);
+        ObservableList<PieChart.Data> reportData = inventoryService.getCategoryReportData();
+        stockPieChart.setData(reportData);
     }
 
     @FXML
-    private void exportToCSV() throws IOException {
-        FileWriter writer = new FileWriter("inventory_report.csv");
+    private void exportToCSV() {
+        try {
+            inventoryService.exportInventoryToCSV("inventory_report.csv");
+            AlertUtil.showInfo("Export Complete", "Inventory report successfully exported to CSV.");
+        } catch (IOException e) {
+            AlertUtil.showError("Error", "Failed to export inventory to CSV.");
+        }
+    }
 
-        writer.append("ID, Name, Category, Quantity, Price\n");
+    @FXML
+    private void onNewButtonClicked() {
+        AlertUtil.showInfo("New Inventory", "You can now start managing a new inventory.");
+    }
 
-            for(InventoryItem item : inventoryItemRepository.findAll()) {
-                writer.append(item.getId() + ", " + item.getName() + ", " + item.getCategory() + ", " +
-                        item.getQuantity() + ", " + item.getPrice() + "\n");
-            }
-
-            writer.flush();
-            writer.close();
+    @FXML
+    private void onLoadButtonClicked() {
+        ObservableList<InventoryItem> items = inventoryService.loadInventoryFromDatabase();
+        setTableData(items);
     }
 }

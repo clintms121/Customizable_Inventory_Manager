@@ -17,6 +17,7 @@ public class JavaFxInventoryApplication extends Application {
             Parent root = loader.load();
             primaryStage.setTitle("Inventory Manager");
             primaryStage.setScene(new Scene(root));
+            primaryStage.setResizable(false);
             primaryStage.show();
         } catch (Exception e) {
             System.err.println("Error loading FXML file: " + e.getMessage());
