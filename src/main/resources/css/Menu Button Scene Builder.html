@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scene Builder Menu</title>
+    <style>
+        .menu-item,
+        .menu-open-button {
+            background: #EEEEEE;
+            border-radius: 100%;
+            width: 80px;
+            height: 80px;
+            margin-left: -40px;
+            position: absolute;
+            color: #FFFFFF;
+            text-align: center;
+            line-height: 80px;
+            transform: translate3d(0, 0, 0);
+            transition: transform ease-out 200ms;
+        }
+
+        .menu-open {
+            display: none;
+        }
+
+        .lines {
+            width: 25px;
+            height: 3px;
+            background: #596778;
+            display: block;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            margin-left: -12.5px;
+            margin-top: -1.5px;
+            transition: transform 200ms;
+        }
+
+        .line-1 {
+            transform: translate3d(0, -8px, 0);
+        }
+
+        .line-2 {
+            transform: translate3d(0, 0, 0);
+        }
+
+        .line-3 {
+            transform: translate3d(0, 8px, 0);
+        }
+
+        .menu-open:checked + .menu-open-button .line-1 {
+            transform: translate3d(0, 0, 0) rotate(45deg);
+        }
+
+        .menu-open:checked + .menu-open-button .line-2 {
+            transform: translate3d(0, 0, 0) scale(0.1, 1);
+        }
+
+        .menu-open:checked + .menu-open-button .line-3 {
+            transform: translate3d(0, 0, 0) rotate(-45deg);
+        }
+
+        .menu {
+            margin: auto;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            width: 80px;
+            height: 80px;
+            text-align: center;
+            box-sizing: border-box;
+            font-size: 26px;
+        }
+
+        .menu-item:hover {
+            background: #EEEEEE;
+            color: #3290B1;
+        }
+
+        .menu-item:nth-child(3),
+        .menu-item:nth-child(4),
+        .menu-item:nth-child(5),
+        .menu-item:nth-child(6),
+        .menu-item:nth-child(7),
+        .menu-item:nth-child(8),
+        .menu-item:nth-child(9) {
+            transition-duration: 180ms;
+        }
+
+        .menu-open-button {
+            z-index: 2;
+            transition: transform 400ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform: scale(1.1, 1.1) translate3d(0, 0, 0);
+            cursor: pointer;
+            box-shadow: 3px 3px 0 0 rgba(0, 0, 0, 0.14);
+        }
+
+        .menu-open-button:hover {
+            transform: scale(1.2, 1.2) translate3d(0, 0, 0);
+        }
+
+        .menu-open:checked + .menu-open-button {
+            transition: transform 200ms linear;
+            transform: scale(0.8, 0.8) translate3d(0, 0, 0);
+        }
+
+        .menu-open:checked ~ .menu-item {
+            transition: transform 200ms cubic-bezier(0.935, 0, 0.34, 1.33);
+        }
+
+        .blue {
+            background-color: #669AE1;
+            box-shadow: 3px 3px 0 0 rgba(0, 0, 0, 0.14);
+        }
+
+        .green {
+            background-color: #70CC72;
+            box-shadow: 3px 3px 0 0 rgba(0, 0, 0, 0.14);
+        }
+
+        .red {
+            background-color: #FE4365;
+            box-shadow: 3px 3px 0 0 rgba(0, 0, 0, 0.14);
+        }
+
+        .purple {
+            background-color: #C49CDE;
+            box-shadow: 3px 3px 0 0 rgba(0, 0, 0, 0.14);
+        }
+
+        .orange {
+            background-color: #FC913A;
+            box-shadow: 3px 3px 0 0 rgba(0, 0, 0, 0.14);
+        }
+
+        .lightblue {
+            background-color: #62C2E4;
+            box-shadow: 3px 3px 0 0 rgba(0, 0, 0, 0.14);
+        }
+    </style>
+</head>
+<body>
+<nav class="menu">
+    <input type="checkbox" href="#" class="menu-open" name="menu-open" id="menu-open">
+    <label class="menu-open-button" for="menu-open">
+        <span class="lines line-1"></span>
+        <span class="lines line-2"></span>
+        <span class="lines line-3"></span>
+    </label>
+    <a href="#" class="menu-item blue"><i class="fa fa-anchor"></i></a>
+    <a href="#" class="menu-item green"><i class="fa fa-coffee"></i></a>
+    <a href="#" class="menu-item red"><i class="fa fa-heart"></i></a>
+    <a href="#" class="menu-item purple"><i class="fa fa-microphone"></i></a>
+    <a href="#" class="menu-item orange"><i class="fa fa-star"></i></a>
+    <a href="#" class="menu-item lightblue"><i class="fa fa-diamond"></i></a>
+</nav>
+</body>
+</html>
