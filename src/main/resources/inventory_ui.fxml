@@ -1,82 +1,85 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
+<?import javafx.scene.shape.Circle?>
 <?import javafx.scene.text.Text?>
 
-<HBox fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="592.0" prefWidth="793.0" styleClass="speed-builder-hbox" stylesheets="@css/style.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1">
-   <children>
-      <VBox prefHeight="546.0" prefWidth="209.0">
-         <children>
-            <AnchorPane fx:id="side_ankerpane" prefHeight="593.0" prefWidth="200.0" styleClass="side_ankerpane" stylesheets="@css/style.css">
-               <children>
-                  <Pane layoutX="5.0" layoutY="382.0" prefHeight="200.0" prefWidth="200.0">
-                     <children>
-                        <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="36.0" layoutY="25.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@imgs/boxes.png" />
-                           </image>
-                        </ImageView>
-                     </children>
-                  </Pane>
-                  <Button fx:id="newButton" layoutX="22.0" layoutY="275.0" mnemonicParsing="false" onAction="#onNewButtonClicked" prefHeight="39.0" prefWidth="183.0" styleClass="btn_create" stylesheets="@css/style.css" text="New" textFill="WHITE">
-                     <font>
-                        <Font name="Century Gothic Bold" size="12.0" />
-                     </font>
-                     <graphic>
-                        <ImageView fitHeight="17.0" fitWidth="17.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../../../../../../../../../../../Downloads/plus.png" />
-                           </image>
-                        </ImageView>
-                     </graphic>
-                  </Button>
-                  <Button fx:id="loadButton" layoutX="23.0" layoutY="314.0" mnemonicParsing="false" onAction="#onLoadButtonClicked" prefHeight="39.0" prefWidth="183.0" styleClass="btn_load" stylesheets="@css/style.css" text="Load" textFill="WHITE">
-                     <font>
-                        <Font name="Century Gothic Bold" size="12.0" />
-                     </font>
-                     <graphic>
-                        <ImageView fitHeight="17.0" fitWidth="17.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../../../../../../../../../../../Downloads/plus.png" />
-                           </image>
-                        </ImageView>
-                     </graphic>
-                  </Button>
-                  <Text fill="WHITE" fontSmoothingType="LCD" layoutX="15.0" layoutY="36.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="title" text="Easy Inventory" textAlignment="CENTER" wrappingWidth="200.0">
-                     <font>
-                        <Font name="Copperplate Gothic Bold" size="25.0" />
-                     </font>
-                  </Text>
-                  <ImageView fitHeight="39.0" fitWidth="34.0" layoutX="14.0" layoutY="141.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@imgs/icons8-github-48.png" />
-                     </image>
-                  </ImageView>
-                  <ImageView fitHeight="93.0" fitWidth="38.0" layoutX="12.0" layoutY="189.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@imgs/icons8-linkedin-48.png" />
-                     </image>
-                  </ImageView>
-                  <Text fill="WHITE" fontSmoothingType="LCD" layoutX="5.0" layoutY="165.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="title" text="        Clintms121" textAlignment="CENTER" wrappingWidth="183.0">
-                     <font>
-                        <Font name="Copperplate Gothic Bold" size="19.0" />
-                     </font>
-                  </Text>
-                  <Text fill="WHITE" fontSmoothingType="LCD" layoutX="48.0" layoutY="216.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="title" text="Clint Stapleton" textAlignment="CENTER" wrappingWidth="183.0">
-                     <font>
-                        <Font name="Copperplate Gothic Bold" size="19.0" />
-                     </font>
-                  </Text>
-               </children>
-            </AnchorPane>
-         </children>
+<AnchorPane style="-fx-background-color: #f8f9fa;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mainPackage.interfaceController">
+
+   <!-- Side Navigation -->
+   <VBox prefWidth="250" style="-fx-background-color: white; -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 10, 0, 0, 0);" styleClass="sidebar" stylesheets="@css/style.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+
+      <!-- App Title -->
+      <HBox alignment="CENTER" spacing="10" style="-fx-padding: 20;">
+         <Circle fill="#4CAF50" radius="5" />
+         <Label style="-fx-font-size: 20; -fx-font-weight: bold;" text="Easy Inventory" />
+      </HBox>
+
+      <!-- Navigation Links -->
+      <VBox spacing="5" style="-fx-padding: 20 10;">
+         <Button fx:id="dashboardButton" style="-fx-background-color: transparent; -fx-alignment: CENTER_LEFT; -fx-padding: 10 15;" styleClass="nav-button" stylesheets="@css/style.css" text="Dashboard" />
+         <Button fx:id="inventoryButton" style="-fx-background-color: #f8f9fa; -fx-alignment: CENTER_LEFT; -fx-padding: 10 15;" styleClass="nav-button" stylesheets="@css/style.css" text="Inventory" />
+         <Button fx:id="categoriesButton" style="-fx-background-color: transparent; -fx-alignment: CENTER_LEFT; -fx-padding: 10 15;" styleClass="nav-button" stylesheets="@css/style.css" text="Categories" />
+         <Button fx:id="reportsButton" style="-fx-background-color: transparent; -fx-alignment: CENTER_LEFT; -fx-padding: 10 15;" styleClass="nav-button" stylesheets="@css/style.css" text="Reports" />
       </VBox>
-   </children>
-</HBox>
+   </VBox>
+
+   <!-- Main Content Area -->
+   <VBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="250.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+
+      <!-- Top Bar -->
+      <HBox alignment="CENTER_LEFT" spacing="15" style="-fx-padding: 20; -fx-background-color: white; -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 5, 0, 0, 0);">
+         <TextField fx:id="searchField" promptText="Search inventory..." style="-fx-pref-width: 300; -fx-background-radius: 20; -fx-padding: 8;" />
+         <Region HBox.hgrow="ALWAYS" />
+         <Button fx:id="addButton" style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 8 20;" styleClass="nav-button" stylesheets="@css/style.css" text="+ Add Item" />
+      </HBox>
+
+      <!-- Stats Cards -->
+      <FlowPane hgap="20" style="-fx-padding: 20;" vgap="20">
+         <VBox style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 10; -fx-min-width: 200; -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 5, 0, 0, 0);" styleClass="stat-card">
+            <Label style="-fx-text-fill: #666;" text="Total Items" />
+            <Label fx:id="totalItemsLabel" style="-fx-font-size: 24; -fx-font-weight: bold;" text="2,459" />
+         </VBox>
+
+         <VBox style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 10; -fx-min-width: 200; -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 5, 0, 0, 0);" styleClass="stat-card">
+            <Label style="-fx-text-fill: #666;" text="Low Stock" />
+            <Label fx:id="lowStockLabel" style="-fx-font-size: 24; -fx-font-weight: bold; -fx-text-fill: #f44336;" text="12" />
+         </VBox>
+
+         <VBox style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 10; -fx-min-width: 200; -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 5, 0, 0, 0);" styleClass="stat-card">
+            <Label style="-fx-text-fill: #666;" text="Total Value" />
+            <Label fx:id="totalValueLabel" style="-fx-font-size: 24; -fx-font-weight: bold;" text="124,750" />
+         </VBox>
+      </FlowPane>
+
+      <!-- Inventory Table -->
+      <VBox style="-fx-padding: 20;" VBox.vgrow="ALWAYS">
+         <TableView fx:id="inventoryTable" style="-fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 5, 0, 0, 0);" VBox.vgrow="ALWAYS">
+            <columns>
+               <TableColumn fx:id="nameColumn" prefWidth="200" text="Item Name" />
+               <TableColumn fx:id="skuColumn" prefWidth="100" text="SKU" />
+               <TableColumn fx:id="categoryColumn" prefWidth="150" text="Category" />
+               <TableColumn fx:id="quantityColumn" prefWidth="100" text="Quantity" />
+               <TableColumn fx:id="priceColumn" prefWidth="100" text="Price" />
+               <TableColumn fx:id="statusColumn" prefWidth="100" text="Status" />
+               <TableColumn fx:id="actionsColumn" prefWidth="100" text="Actions" />
+            </columns>
+            <placeholder>
+               <VBox alignment="CENTER" spacing="10">
+                  <Text style="-fx-font-size: 16; -fx-fill: #666;" text="No items found" />
+                  <Button style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-background-radius: 20;" text="Add Your First Item" />
+               </VBox>
+            </placeholder>
+         </TableView>
+      </VBox>
+   </VBox>
+</AnchorPane>
