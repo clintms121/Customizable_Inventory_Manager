@@ -28,7 +28,6 @@
       <VBox spacing="5" style="-fx-padding: 20 10;">
          <Button fx:id="dashboardButton" style="-fx-background-color: transparent; -fx-alignment: CENTER_LEFT; -fx-padding: 10 15;" styleClass="nav-button" stylesheets="@css/style.css" text="Dashboard" />
          <Button fx:id="inventoryButton" style="-fx-background-color: #f8f9fa; -fx-alignment: CENTER_LEFT; -fx-padding: 10 15;" styleClass="nav-button" stylesheets="@css/style.css" text="Inventory" />
-         <Button fx:id="categoriesButton" style="-fx-background-color: transparent; -fx-alignment: CENTER_LEFT; -fx-padding: 10 15;" styleClass="nav-button" stylesheets="@css/style.css" text="Categories" />
          <Button fx:id="reportsButton" style="-fx-background-color: transparent; -fx-alignment: CENTER_LEFT; -fx-padding: 10 15;" styleClass="nav-button" stylesheets="@css/style.css" text="Reports" />
       </VBox>
    </VBox>

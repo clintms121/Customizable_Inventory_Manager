@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.chart.BarChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.FlowPane?>
+
+<VBox spacing="20" style="-fx-padding: 20;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mainPackage.DashboardController">
+    <HBox alignment="CENTER_LEFT" spacing="15" style="-fx-padding: 20; -fx-background-color: white; -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 5, 0, 0, 0);">
+        <Label style="-fx-font-size: 24; -fx-font-weight: bold;" text="Dashboard Overview" />
+    </HBox>
+
+    <FlowPane hgap="20" vgap="20">
+        <VBox style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 10; -fx-min-width: 300; -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 5, 0, 0, 0);">
+            <Label style="-fx-font-size: 16; -fx-font-weight: bold;" text="Sales Overview" />
+            <BarChart fx:id="salesChart">
+                <xAxis>
+                    <CategoryAxis label="Month" />
+                </xAxis>
+                <yAxis>
+                    <NumberAxis label="Sales ($)" />
+                </yAxis>
+            </BarChart>
+        </VBox>
+
+        <VBox style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 10; -fx-min-width: 300; -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 5, 0, 0, 0);">
+            <Label style="-fx-font-size: 16; -fx-font-weight: bold;" text="Category Distribution" />
+            <BarChart fx:id="categoryChart">
+                <xAxis>
+                    <CategoryAxis label="Category" />
+                </xAxis>
+                <yAxis>
+                    <NumberAxis label="Items" />
+                </yAxis>
+            </BarChart>
+        </VBox>
+    </FlowPane>
+</VBox>

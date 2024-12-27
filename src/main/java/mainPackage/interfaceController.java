@@ -1,8 +1,10 @@
 package mainPackage;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
+import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.collections.FXCollections;
@@ -10,12 +12,28 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.geometry.Pos;
+import javafx.stage.StageStyle;
+import javafx.animation.TranslateTransition;
+import javafx.animation.FadeTransition;
+import javafx.util.Duration;
+import javafx.scene.control.Button;
+import javafx.animation.ScaleTransition;
+
+import java.io.IOException;
 import java.net.URL;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class interfaceController implements Initializable {
+
+    @FXML private Button dashboardButton;
+    @FXML private Button inventoryButton;
+    @FXML private Button reportsButton;
+    @FXML private VBox mainContentArea;
+
+
     @FXML private TextField searchField;
     @FXML private TableView<InventoryItem> inventoryTable;
     @FXML private TableColumn<InventoryItem, String> nameColumn;
@@ -40,6 +58,62 @@ public class interfaceController implements Initializable {
         setupActions();
         loadSampleData();
         updateStats();
+        setupNavigation();
+    }
+
+    private void setupNavigation() {
+        dashboardButton.setOnAction(e -> navigateTo("Dashboard"));
+        inventoryButton.setOnAction(e -> navigateTo("Inventory"));
+        reportsButton.setOnAction(e -> navigateTo("Reports"));
+    }
+
+    private void navigateTo(String view) {
+        try {
+            // First, reset all button styles
+            dashboardButton.setStyle("-fx-background-color: transparent; -fx-alignment: CENTER_LEFT; -fx-padding: 10 15;");
+            inventoryButton.setStyle("-fx-background-color: transparent; -fx-alignment: CENTER_LEFT; -fx-padding: 10 15;");
+            reportsButton.setStyle("-fx-background-color: transparent; -fx-alignment: CENTER_LEFT; -fx-padding: 10 15;");
+
+            // Highlight the selected button
+            switch (view) {
+                case "Dashboard":
+                    dashboardButton.setStyle("-fx-background-color: #f8f9fa; -fx-alignment: CENTER_LEFT; -fx-padding: 10 15;");
+                    loadView("/fxml/Dashboard.fxml");
+                    break;
+                case "Inventory":
+                    inventoryButton.setStyle("-fx-background-color: #f8f9fa; -fx-alignment: CENTER_LEFT; -fx-padding: 10 15;");
+                    mainContentArea.getChildren().clear();
+                    mainContentArea.getChildren().addAll(
+                            searchField.getParent().getParent(),
+                            inventoryTable.getParent().getParent()
+                    );
+                    break;
+                case "Reports":
+                    reportsButton.setStyle("-fx-background-color: #f8f9fa; -fx-alignment: CENTER_LEFT; -fx-padding: 10 15;");
+                    loadView("/fxml/Reports.fxml");
+                    break;
+            }
+        } catch (Exception e) {
+            showAlert("Navigation Error", "Could not load " + view + " view.");
+            e.printStackTrace();
+        }
+    }
+
+    private void loadView(String fxmlPath) {
+        try {
+            Parent view = FXMLLoader.load(getClass().getResource(fxmlPath));
+            mainContentArea.getChildren().clear();
+            mainContentArea.getChildren().add(view);
+
+            // Add fade transition
+            FadeTransition fadeIn = new FadeTransition(Duration.millis(300), view);
+            fadeIn.setFromValue(0.0);
+            fadeIn.setToValue(1.0);
+            fadeIn.play();
+        } catch (IOException e) {
+            e.printStackTrace();
+            showAlert("Error", "Could not load view: " + fxmlPath);
+        }
     }
 
     private void setupTable() {
@@ -77,8 +151,9 @@ public class interfaceController implements Initializable {
 
             {
                 buttons.setAlignment(Pos.CENTER);
-                editButton.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white; -fx-background-radius: 15;");
-                deleteButton.setStyle("-fx-background-color: #f44336; -fx-text-fill: white; -fx-background-radius: 15;");
+                buttons.setTranslateX(-10);
+                editButton.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white; -fx-background-radius: 15; -fx-padding: 5 10; -fx-font-size: 10px; -fx-font-weight: bold; -fx-border-color: #1E88E5; -fx-border-width: 1px; -fx-border-radius: 15; -fx-pref-width: 30px; -fx-pref-height: 20px; -fx-alignment: center;");
+                deleteButton.setStyle("-fx-background-color: #f44336; -fx-text-fill: white; -fx-background-radius: 15; -fx-padding: 5 10; -fx-font-size: 10px; -fx-font-weight: bold; -fx-border-color: #1E88E5; -fx-border-width: 1px; -fx-border-radius: 15; -fx-pref-width: 30px; -fx-pref-height: 20px; -fx-alignment: center;");
 
                 editButton.setOnAction(event -> {
                     InventoryItem item = getTableRow().getItem();
@@ -134,10 +209,39 @@ public class interfaceController implements Initializable {
         Dialog<InventoryItem> dialog = new Dialog<>();
         dialog.setTitle("Add New Item");
         dialog.setHeaderText("Enter item details");
+        dialog.initStyle(StageStyle.UNDECORATED);
+        dialog.getDialogPane().getStylesheets().add(getClass().getResource("/css/dialogStyles.css").toExternalForm());
+        dialog.getDialogPane().getStyleClass().add("dialog-pane");
 
         // Set the button types
         ButtonType saveButtonType = new ButtonType("Save", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(saveButtonType, ButtonType.CANCEL);
+
+        //grab the save and cancel buttons in the pane
+        Button saveButton = (Button) dialog.getDialogPane().lookupButton(saveButtonType);
+        Button cancelButton = (Button) dialog.getDialogPane().lookupButton(ButtonType.CANCEL);
+
+        ScaleTransition saveButtonScale = new ScaleTransition(Duration.millis(200), saveButton);
+        saveButtonScale.setToX(1.1);  // Scale to 110% of original size
+        saveButtonScale.setToY(1.1);
+        saveButtonScale.setAutoReverse(true);
+        saveButton.setOnMouseEntered(e -> saveButtonScale.playFromStart());
+        saveButton.setOnMouseExited(e -> {
+            saveButtonScale.stop();
+            saveButton.setScaleX(1.1);
+            saveButton.setScaleY(1.0);
+        });
+
+        ScaleTransition cancelButtonScale = new ScaleTransition(Duration.millis(200), cancelButton);
+        cancelButtonScale.setToX(1.1);  // Scale to 110% of original size
+        cancelButtonScale.setToY(1.1);
+        cancelButtonScale.setAutoReverse(true);
+        cancelButton.setOnMouseEntered(e -> cancelButtonScale.playFromStart());
+        cancelButton.setOnMouseExited(e -> {
+            cancelButtonScale.stop();
+            cancelButton.setScaleX(1.1);
+            cancelButton.setScaleY(1.0);
+        });
 
         // Create the form grid
         GridPane grid = new GridPane();
@@ -199,6 +303,9 @@ public class interfaceController implements Initializable {
         Dialog<InventoryItem> dialog = new Dialog<>();
         dialog.setTitle("Edit Item");
         dialog.setHeaderText("Edit item details");
+        dialog.initStyle(StageStyle.UNDECORATED);
+        dialog.getDialogPane().getStylesheets().add(getClass().getResource("/css/dialogStyles.css").toExternalForm());
+        dialog.getDialogPane().getStyleClass().add("dialog-pane");
 
         ButtonType saveButtonType = new ButtonType("Save", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(saveButtonType, ButtonType.CANCEL);
@@ -226,6 +333,32 @@ public class interfaceController implements Initializable {
         grid.add(price, 1, 4);
 
         dialog.getDialogPane().setContent(grid);
+
+        //grab the save and cancel buttons in the pane
+        Button saveButton = (Button) dialog.getDialogPane().lookupButton(saveButtonType);
+        Button cancelButton = (Button) dialog.getDialogPane().lookupButton(ButtonType.CANCEL);
+
+        ScaleTransition saveButtonScale = new ScaleTransition(Duration.millis(200), saveButton);
+        saveButtonScale.setToX(1.1);  // Scale to 110% of original size
+        saveButtonScale.setToY(1.1);
+        saveButtonScale.setAutoReverse(true);
+        saveButton.setOnMouseEntered(e -> saveButtonScale.playFromStart());
+        saveButton.setOnMouseExited(e -> {
+            saveButtonScale.stop();
+            saveButton.setScaleX(1.1);
+            saveButton.setScaleY(1.0);
+        });
+
+        ScaleTransition cancelButtonScale = new ScaleTransition(Duration.millis(200), cancelButton);
+        cancelButtonScale.setToX(1.1);  // Scale to 110% of original size
+        cancelButtonScale.setToY(1.1);
+        cancelButtonScale.setAutoReverse(true);
+        cancelButton.setOnMouseEntered(e -> cancelButtonScale.playFromStart());
+        cancelButton.setOnMouseExited(e -> {
+            cancelButtonScale.stop();
+            cancelButton.setScaleX(1.1);
+            cancelButton.setScaleY(1.0);
+        });
 
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == saveButtonType) {
@@ -263,6 +396,9 @@ public class interfaceController implements Initializable {
         alert.setTitle("Delete Item");
         alert.setHeaderText("Delete " + item.getName());
         alert.setContentText("Are you sure you want to delete this item?");
+
+        alert.getDialogPane().getStylesheets().add(getClass().getResource("/css/alertStyles.css").toExternalForm());
+        alert.getDialogPane().getStyleClass().add("dialog-pane");
 
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
