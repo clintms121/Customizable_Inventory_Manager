@@ -10,9 +10,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.geometry.Pos;
 import javafx.stage.StageStyle;
 import javafx.animation.TranslateTransition;
@@ -48,6 +46,10 @@ public class interfaceController implements Initializable {
     @FXML private Label totalValueLabel;
     @FXML private Button addButton;
 
+    private ReportsController reportsController;
+
+
+
     private ObservableList<InventoryItem> inventoryItems = FXCollections.observableArrayList();
     private FilteredList<InventoryItem> filteredItems;
 
@@ -59,7 +61,10 @@ public class interfaceController implements Initializable {
         loadSampleData();
         updateStats();
         setupNavigation();
+        updateReports();
     }
+
+
 
     private void setupNavigation() {
         dashboardButton.setOnAction(e -> navigateTo("Dashboard"));
@@ -74,7 +79,8 @@ public class interfaceController implements Initializable {
             inventoryButton.setStyle("-fx-background-color: transparent; -fx-alignment: CENTER_LEFT; -fx-padding: 10 15;");
             reportsButton.setStyle("-fx-background-color: transparent; -fx-alignment: CENTER_LEFT; -fx-padding: 10 15;");
 
-            // Highlight the selected button
+            mainContentArea.getChildren().clear();
+
             switch (view) {
                 case "Dashboard":
                     dashboardButton.setStyle("-fx-background-color: #f8f9fa; -fx-alignment: CENTER_LEFT; -fx-padding: 10 15;");
@@ -82,22 +88,91 @@ public class interfaceController implements Initializable {
                     break;
                 case "Inventory":
                     inventoryButton.setStyle("-fx-background-color: #f8f9fa; -fx-alignment: CENTER_LEFT; -fx-padding: 10 15;");
-                    mainContentArea.getChildren().clear();
-                    mainContentArea.getChildren().addAll(
-                            searchField.getParent().getParent(),
-                            inventoryTable.getParent().getParent()
-                    );
+
+                    // Recreate the top bar
+                    HBox topBar = new HBox();
+                    topBar.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+                    topBar.setSpacing(15);
+                    topBar.setStyle("-fx-padding: 20; -fx-background-color: white; -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 5, 0, 0, 0);");
+
+                    searchField.setPromptText("Search inventory...");
+                    searchField.setStyle("-fx-pref-width: 300; -fx-background-radius: 20; -fx-padding: 8;");
+
+                    Region spacer = new Region();
+                    HBox.setHgrow(spacer, Priority.ALWAYS);
+
+                    addButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 8 20;");
+
+                    topBar.getChildren().addAll(searchField, spacer, addButton);
+
+                    // Recreate the stats cards
+                    FlowPane statsPane = new FlowPane();
+                    statsPane.setHgap(20);
+                    statsPane.setVgap(20);
+                    statsPane.setStyle("-fx-padding: 20;");
+
+                    // Total Items card
+                    VBox totalItemsCard = createStatsCard("Total Items", totalItemsLabel);
+
+                    // Low Stock card
+                    VBox lowStockCard = createStatsCard("Low Stock", lowStockLabel);
+                    lowStockLabel.setStyle("-fx-font-size: 24; -fx-font-weight: bold; -fx-text-fill: #f44336;");
+
+                    // Total Value card
+                    VBox totalValueCard = createStatsCard("Total Value", totalValueLabel);
+
+                    statsPane.getChildren().addAll(totalItemsCard, lowStockCard, totalValueCard);
+
+                    // Table container
+                    VBox tableContainer = new VBox();
+                    tableContainer.setStyle("-fx-padding: 20;");
+                    VBox.setVgrow(tableContainer, Priority.ALWAYS);
+
+                    inventoryTable.setStyle("-fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 5, 0, 0, 0);");
+                    VBox.setVgrow(inventoryTable, Priority.ALWAYS);
+
+                    tableContainer.getChildren().add(inventoryTable);
+
+                    // Add all components to mainContentArea
+                    mainContentArea.getChildren().addAll(topBar, statsPane, tableContainer);
                     break;
                 case "Reports":
                     reportsButton.setStyle("-fx-background-color: #f8f9fa; -fx-alignment: CENTER_LEFT; -fx-padding: 10 15;");
-                    loadView("/fxml/Reports.fxml");
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Reports.fxml"));
+                    Parent reportsView = loader.load();
+                    reportsController = loader.getController();
+                    reportsController.updateReports(inventoryItems);  // Update reports with current inventory
+                    mainContentArea.getChildren().clear();
+                    mainContentArea.getChildren().add(reportsView);
                     break;
             }
         } catch (Exception e) {
-            showAlert("Navigation Error", "Could not load " + view + " view.");
+            showAlert("Navigation Error", "Could not load " + view + " view: " + e.getMessage());
             e.printStackTrace();
         }
     }
+
+    private VBox createStatsCard(String title, Label valueLabel) {
+        VBox card = new VBox();
+        card.setStyle("-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 10; " +
+                "-fx-min-width: 200; -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 5, 0, 0, 0);");
+        card.getStyleClass().add("stat-card");
+
+        Label titleLabel = new Label(title);
+        titleLabel.setStyle("-fx-text-fill: #666;");
+
+        valueLabel.setStyle("-fx-font-size: 24; -fx-font-weight: bold;");
+
+        card.getChildren().addAll(titleLabel, valueLabel);
+        return card;
+    }
+
+    private void updateReports() {
+        if (reportsController != null) {
+            reportsController.updateReports(inventoryItems);
+        }
+    }
+
 
     private void loadView(String fxmlPath) {
         try {
@@ -197,11 +272,7 @@ public class interfaceController implements Initializable {
     }
     private void loadSampleData() {
         inventoryItems.addAll(
-                new InventoryItem("MacBook Pro", "LAP-001", "Electronics", 15, 1299.99, "In Stock"),
-                new InventoryItem("Wireless Mouse", "ACC-001", "Accessories", 8, 49.99, "Low Stock"),
-                new InventoryItem("Office Chair", "FUR-001", "Furniture", 5, 199.99, "Low Stock"),
-                new InventoryItem("Monitor 27\"", "DSP-001", "Electronics", 12, 349.99, "In Stock"),
-                new InventoryItem("USB-C Cable", "ACC-002", "Accessories", 50, 19.99, "In Stock")
+                new InventoryItem("Sample Item", "SMP-001", "Section", 1, 10.00, "In Stock")
         );
     }
 
@@ -296,6 +367,7 @@ public class interfaceController implements Initializable {
         result.ifPresent(item -> {
             inventoryItems.add(item);
             updateStats();
+            updateReports();
         });
     }
 
@@ -388,6 +460,7 @@ public class interfaceController implements Initializable {
             int index = inventoryItems.indexOf(item);
             inventoryItems.set(index, updatedItem);
             updateStats();
+            updateReports();
         });
     }
 
@@ -404,6 +477,7 @@ public class interfaceController implements Initializable {
         if (result.isPresent() && result.get() == ButtonType.OK) {
             inventoryItems.remove(item);
             updateStats();
+            updateReports();
         }
     }
 
@@ -434,4 +508,6 @@ public class interfaceController implements Initializable {
         alert.setContentText(content);
         alert.showAndWait();
     }
+
+
 }

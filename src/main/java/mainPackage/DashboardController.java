@@ -2,43 +2,78 @@ package mainPackage;
 
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.chart.BarChart;
-import javafx.scene.chart.XYChart;
+import javafx.scene.control.*;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import java.awt.Desktop;
+import java.net.URI;
 import java.net.URL;
 import java.util.ResourceBundle;
 
 public class DashboardController implements Initializable {
-    @FXML private BarChart<String, Number> salesChart;
-    @FXML private BarChart<String, Number> categoryChart;
+    @FXML private Hyperlink githubLink;
+    @FXML private Hyperlink linkedinLink;
+    @FXML private Label repoCount;
+    @FXML private Label contributionsCount;
+    @FXML private Label lastActivity;
+    @FXML private Label connectionsCount;
+    @FXML private Label skillsCount;
+    @FXML private Label profileViews;
+    @FXML private ListView<String> activityFeed;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        setupSalesChart();
-        setupCategoryChart();
+        loadGitHubStats();
+        loadLinkedInStats();
+        loadRecentActivity();
     }
 
-    private void setupSalesChart() {
-        XYChart.Series<String, Number> series = new XYChart.Series<>();
-        series.setName("Monthly Sales");
-
-        // Add sample data
-        series.getData().add(new XYChart.Data<>("Jan", 23500));
-        series.getData().add(new XYChart.Data<>("Feb", 34200));
-        series.getData().add(new XYChart.Data<>("Mar", 28700));
-        series.getData().add(new XYChart.Data<>("Apr", 32100));
-
-        salesChart.getData().add(series);
+    @FXML
+    private void openGithub() {
+        openUrl("https://github.com/clintms121");
     }
 
-    private void setupCategoryChart() {
-        XYChart.Series<String, Number> series = new XYChart.Series<>();
-        series.setName("Items per Category");
+    @FXML
+    private void openLinkedIn() {
+        openUrl("www.linkedin.com/in/clint-stapleton-73284a2b8");
+    }
 
-        // Add sample data
-        series.getData().add(new XYChart.Data<>("Electronics", 45));
-        series.getData().add(new XYChart.Data<>("Furniture", 30));
-        series.getData().add(new XYChart.Data<>("Accessories", 25));
+    private void openUrl(String url) {
+        try {
+            Desktop.getDesktop().browse(new URI(url));
+        } catch (Exception e) {
+            showAlert("Error", "Could not open URL: " + url);
+        }
+    }
 
-        categoryChart.getData().add(series);
+    private void loadGitHubStats() {
+        // In a real application, you would fetch these from GitHub's API
+        repoCount.setText("3");
+        contributionsCount.setText("15");
+        lastActivity.setText("1 hour ago");
+    }
+
+    private void loadLinkedInStats() {
+        // In a real application, you would fetch these from LinkedIn's API
+        connectionsCount.setText("123");
+        skillsCount.setText("Java, C#, Python, JavaScript, HTML, CSS, SQL");
+        profileViews.setText("87 this week");
+    }
+
+    private void loadRecentActivity() {
+        ObservableList<String> activities = FXCollections.observableArrayList(
+                "Pushed to main in inventory manager repository",
+                "Created new repository: inventory-manager",
+                "Updated LinkedIn profile with new skills"
+        );
+        activityFeed.setItems(activities);
+    }
+
+    private void showAlert(String title, String content) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 }

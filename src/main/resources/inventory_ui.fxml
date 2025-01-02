@@ -33,7 +33,7 @@
    </VBox>
 
    <!-- Main Content Area -->
-   <VBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="250.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+   <VBox fx:id="mainContentArea" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="250.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
 
       <!-- Top Bar -->
       <HBox alignment="CENTER_LEFT" spacing="15" style="-fx-padding: 20; -fx-background-color: white; -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 5, 0, 0, 0);">
@@ -75,7 +75,7 @@
             <placeholder>
                <VBox alignment="CENTER" spacing="10">
                   <Text style="-fx-font-size: 16; -fx-fill: #666;" text="No items found" />
-                  <Button style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-background-radius: 20;" text="Add Your First Item" />
+
                </VBox>
             </placeholder>
          </TableView>
