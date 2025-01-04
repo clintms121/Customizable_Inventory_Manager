@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox alignment="CENTER" spacing="20" style="-fx-background-color: white; -fx-padding: 30;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mainPackage.LoginController">
+    <children>
+        <Label text="Inventory Manager Login" style="-fx-font-size: 24; -fx-font-weight: bold;"/>
+
+        <VBox spacing="10" style="-fx-max-width: 300;">
+            <TextField fx:id="usernameField" promptText="Username" style="-fx-padding: 10; -fx-background-radius: 5;"/>
+            <PasswordField fx:id="passwordField" promptText="Password" style="-fx-padding: 10; -fx-background-radius: 5;"/>
+        </VBox>
+
+        <HBox spacing="10" alignment="CENTER">
+            <Button fx:id="loginButton" text="Login" style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-padding: 10 20; -fx-background-radius: 5;"/>
+            <Button fx:id="registerButton" text="Register" style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-padding: 10 20; -fx-background-radius: 5;"/>
+        </HBox>
+    </children>
+</VBox>

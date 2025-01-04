@@ -9,16 +9,26 @@ import javafx.stage.Stage;
 public class Launcher extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
-        // Use the correct relative path to locate the FXML file
-        Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("inventory_ui.fxml"));
+        // Initialize database
+        DatabaseUtil.initializeDatabase();
 
-        primaryStage.setScene(new Scene(root));
-        primaryStage.show();
+        // Load login screen
+        Parent root = FXMLLoader.load(getClass().getResource("/fxml/login.fxml"));
+
+        Scene scene = new Scene(root);
+        primaryStage.setTitle("Inventory Manager");
+        primaryStage.setScene(scene);
         primaryStage.setResizable(false);
+        primaryStage.show();
+    }
+
+    @Override
+    public void stop() {
+        // Clean up database connection when application closes
+        DatabaseUtil.closeConnection();
     }
 
     public static void main(String[] args) {
-        // Launch the JavaFX application
-        Application.launch(Launcher.class);
+        launch(args);
     }
 }

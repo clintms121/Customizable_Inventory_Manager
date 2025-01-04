@@ -21,6 +21,7 @@ import javafx.animation.ScaleTransition;
 
 import java.io.IOException;
 import java.net.URL;
+import java.sql.SQLException;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -53,12 +54,26 @@ public class interfaceController implements Initializable {
     private ObservableList<InventoryItem> inventoryItems = FXCollections.observableArrayList();
     private FilteredList<InventoryItem> filteredItems;
 
+    private void loadInventoryFromDatabase() {
+        try {
+            User currentUser = LoginController.getCurrentUser();
+            if (currentUser != null) {
+                inventoryItems.clear();
+                inventoryItems.addAll(InventoryDAO.loadInventory(currentUser.getId()));
+                updateStats();
+                updateReports();
+            }
+        } catch (SQLException e) {
+            showAlert("Database Error", "Failed to load inventory: " + e.getMessage());
+        }
+    }
+
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         setupTable();
         setupSearch();
         setupActions();
-        loadSampleData();
+        loadInventoryFromDatabase();
         updateStats();
         setupNavigation();
         updateReports();
@@ -339,7 +354,6 @@ public class interfaceController implements Initializable {
 
         dialog.getDialogPane().setContent(grid);
 
-        // Convert the result to an InventoryItem object when the save button is clicked
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == saveButtonType) {
                 try {
@@ -365,9 +379,16 @@ public class interfaceController implements Initializable {
 
         Optional<InventoryItem> result = dialog.showAndWait();
         result.ifPresent(item -> {
-            inventoryItems.add(item);
-            updateStats();
-            updateReports();
+            try {
+                User currentUser = LoginController.getCurrentUser();
+                if (currentUser != null && InventoryDAO.addItem(currentUser.getId(), item)) {
+                    inventoryItems.add(item);
+                    updateStats();
+                    updateReports();
+                }
+            } catch (SQLException e) {
+                showAlert("Database Error", "Failed to add item: " + e.getMessage());
+            }
         });
     }
 
@@ -432,6 +453,8 @@ public class interfaceController implements Initializable {
             cancelButton.setScaleY(1.0);
         });
 
+        String originalSku = item.getSku(); // Store original SKU for database update
+
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == saveButtonType) {
                 try {
@@ -457,10 +480,17 @@ public class interfaceController implements Initializable {
 
         Optional<InventoryItem> result = dialog.showAndWait();
         result.ifPresent(updatedItem -> {
-            int index = inventoryItems.indexOf(item);
-            inventoryItems.set(index, updatedItem);
-            updateStats();
-            updateReports();
+            try {
+                User currentUser = LoginController.getCurrentUser();
+                if (currentUser != null && InventoryDAO.updateItem(currentUser.getId(), originalSku, updatedItem)) {
+                    int index = inventoryItems.indexOf(item);
+                    inventoryItems.set(index, updatedItem);
+                    updateStats();
+                    updateReports();
+                }
+            } catch (SQLException e) {
+                showAlert("Database Error", "Failed to update item: " + e.getMessage());
+            }
         });
     }
 
@@ -470,14 +500,18 @@ public class interfaceController implements Initializable {
         alert.setHeaderText("Delete " + item.getName());
         alert.setContentText("Are you sure you want to delete this item?");
 
-        alert.getDialogPane().getStylesheets().add(getClass().getResource("/css/alertStyles.css").toExternalForm());
-        alert.getDialogPane().getStyleClass().add("dialog-pane");
-
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
-            inventoryItems.remove(item);
-            updateStats();
-            updateReports();
+            try {
+                User currentUser = LoginController.getCurrentUser();
+                if (currentUser != null && InventoryDAO.deleteItem(currentUser.getId(), item.getSku())) {
+                    inventoryItems.remove(item);
+                    updateStats();
+                    updateReports();
+                }
+            } catch (SQLException e) {
+                showAlert("Database Error", "Failed to delete item: " + e.getMessage());
+            }
         }
     }
 
