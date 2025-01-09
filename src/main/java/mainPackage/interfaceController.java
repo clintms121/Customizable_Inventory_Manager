@@ -269,15 +269,7 @@ public class interfaceController implements Initializable {
 
     private void setupSearch() {
         searchField.textProperty().addListener((observable, oldValue, newValue) -> {
-            filteredItems.setPredicate(item -> {
-                if (newValue == null || newValue.isEmpty()) {
-                    return true;
-                }
-                String lowerCaseFilter = newValue.toLowerCase();
-                return item.getName().toLowerCase().contains(lowerCaseFilter) ||
-                        item.getSku().toLowerCase().contains(lowerCaseFilter) ||
-                        item.getCategory().toLowerCase().contains(lowerCaseFilter);
-            });
+            applySearchFilter(newValue);
             updateStats();
         });
     }
@@ -382,7 +374,18 @@ public class interfaceController implements Initializable {
             try {
                 User currentUser = LoginController.getCurrentUser();
                 if (currentUser != null && InventoryDAO.addItem(currentUser.getId(), item)) {
-                    inventoryItems.add(item);
+                    // Create a new ObservableList with all existing items plus the new one
+                    ObservableList<InventoryItem> newList = FXCollections.observableArrayList(inventoryItems);
+                    newList.add(item);
+                    inventoryItems = newList;
+
+                    // Update the FilteredList with the new ObservableList
+                    filteredItems = new FilteredList<>(inventoryItems, p -> true);
+                    inventoryTable.setItems(filteredItems);
+
+                    // Apply the current search filter
+                    applySearchFilter(searchField.getText());
+
                     updateStats();
                     updateReports();
                 }
@@ -483,8 +486,19 @@ public class interfaceController implements Initializable {
             try {
                 User currentUser = LoginController.getCurrentUser();
                 if (currentUser != null && InventoryDAO.updateItem(currentUser.getId(), originalSku, updatedItem)) {
-                    int index = inventoryItems.indexOf(item);
-                    inventoryItems.set(index, updatedItem);
+                    // Create a new ObservableList with the updated item
+                    ObservableList<InventoryItem> newList = FXCollections.observableArrayList(inventoryItems);
+                    int index = newList.indexOf(item);
+                    newList.set(index, updatedItem);
+                    inventoryItems = newList;
+
+                    // Update the FilteredList with the new ObservableList
+                    filteredItems = new FilteredList<>(inventoryItems, p -> true);
+                    inventoryTable.setItems(filteredItems);
+
+                    // Apply the current search filter
+                    applySearchFilter(searchField.getText());
+
                     updateStats();
                     updateReports();
                 }
@@ -505,7 +519,18 @@ public class interfaceController implements Initializable {
             try {
                 User currentUser = LoginController.getCurrentUser();
                 if (currentUser != null && InventoryDAO.deleteItem(currentUser.getId(), item.getSku())) {
-                    inventoryItems.remove(item);
+                    // Create a new ObservableList without the deleted item
+                    ObservableList<InventoryItem> newList = FXCollections.observableArrayList(inventoryItems);
+                    newList.remove(item);
+                    inventoryItems = newList;
+
+                    // Update the FilteredList with the new ObservableList
+                    filteredItems = new FilteredList<>(inventoryItems, p -> true);
+                    inventoryTable.setItems(filteredItems);
+
+                    // Apply the current search filter
+                    applySearchFilter(searchField.getText());
+
                     updateStats();
                     updateReports();
                 }
@@ -542,6 +567,19 @@ public class interfaceController implements Initializable {
         alert.setContentText(content);
         alert.showAndWait();
     }
+
+    private void applySearchFilter(String searchText) {
+        filteredItems.setPredicate(item -> {
+            if (searchText == null || searchText.isEmpty()) {
+                return true;
+            }
+            String lowerCaseFilter = searchText.toLowerCase();
+            return item.getName().toLowerCase().contains(lowerCaseFilter) ||
+                    item.getSku().toLowerCase().contains(lowerCaseFilter) ||
+                    item.getCategory().toLowerCase().contains(lowerCaseFilter);
+        });
+    }
+
 
 
 }

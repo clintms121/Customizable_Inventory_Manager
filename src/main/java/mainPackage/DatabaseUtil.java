@@ -54,17 +54,17 @@ public class DatabaseUtil {
 
             // Create activity log table
             String createLogTable = """
-                CREATE TABLE IF NOT EXISTS activity_log (
-                    id INT PRIMARY KEY AUTO_INCREMENT,
-                    user_id INT,
-                    action_type VARCHAR(50) NOT NULL,
-                    item_id INT,
-                    description TEXT,
-                    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    FOREIGN KEY (user_id) REFERENCES users(id),
-                    FOREIGN KEY (item_id) REFERENCES inventory(id)
-                )
-            """;
+    CREATE TABLE IF NOT EXISTS activity_log (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        user_id INT,
+        action_type VARCHAR(50) NOT NULL,
+        item_id INT,
+        description TEXT,
+        timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id),
+        FOREIGN KEY (item_id) REFERENCES inventory(id) ON DELETE CASCADE
+    )
+""";
 
             try (PreparedStatement stmt1 = conn.prepareStatement(createUsersTable);
                  PreparedStatement stmt2 = conn.prepareStatement(createInventoryTable);

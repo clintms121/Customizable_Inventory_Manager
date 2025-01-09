@@ -74,17 +74,60 @@ public class InventoryDAO {
     }
 
     public static boolean deleteItem(int userId, String sku) throws SQLException {
-        String sql = "DELETE FROM inventory WHERE user_id = ? AND sku = ?";
+        Connection conn = null;
+        try {
+            conn = DatabaseUtil.getConnection();
+            conn.setAutoCommit(false);  // Start transaction
 
-        try (Connection conn = DatabaseUtil.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            // First, get the item_id
+            String getItemIdSql = "SELECT id FROM inventory WHERE user_id = ? AND sku = ?";
+            int itemId;
 
-            stmt.setInt(1, userId);
-            stmt.setString(2, sku);
+            try (PreparedStatement stmt = conn.prepareStatement(getItemIdSql)) {
+                stmt.setInt(1, userId);
+                stmt.setString(2, sku);
+                ResultSet rs = stmt.executeQuery();
+                if (!rs.next()) {
+                    return false;
+                }
+                itemId = rs.getInt("id");
+            }
 
-            int result = stmt.executeUpdate();
-            logActivity(userId, "DELETE", -1, "Deleted item with SKU: " + sku);
-            return result > 0;
+            // Log the activity before deletion
+            logActivity(userId, "DELETE", itemId, "Deleted item with SKU: " + sku);
+
+            // Then delete the inventory item
+            String deleteItemSql = "DELETE FROM inventory WHERE user_id = ? AND sku = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(deleteItemSql)) {
+                stmt.setInt(1, userId);
+                stmt.setString(2, sku);
+
+                int result = stmt.executeUpdate();
+                if (result > 0) {
+                    conn.commit();  // Commit transaction
+                    return true;
+                } else {
+                    conn.rollback();  // Rollback if delete failed
+                    return false;
+                }
+            }
+        } catch (SQLException e) {
+            if (conn != null) {
+                try {
+                    conn.rollback();  // Rollback on error
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
+            throw e;
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);  // Reset auto-commit
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
@@ -102,4 +145,6 @@ public class InventoryDAO {
             stmt.executeUpdate();
         }
     }
+
+
 }
