@@ -12,13 +12,31 @@ public class DatabaseUtil {
 
     private static Connection connection = null;
 
-    public static Connection getConnection() throws SQLException {
-        if (connection == null || connection.isClosed()) {
+    public static synchronized Connection getConnection() throws SQLException {
+        try {
+            if (connection == null || connection.isClosed()) {
+                try {
+                    Class.forName("com.mysql.cj.jdbc.Driver");
+                    connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+                } catch (ClassNotFoundException e) {
+                    throw new SQLException("MySQL JDBC Driver not found.", e);
+                }
+            }
+            // Test the connection
+            if (!connection.isValid(5)) {  // 5 second timeout
+                connection.close();
+                connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+            }
+        } catch (SQLException e) {
+            // If there's any issue with the connection, try to create a new one
             try {
+                if (connection != null) {
+                    connection.close();
+                }
                 Class.forName("com.mysql.cj.jdbc.Driver");
                 connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
-            } catch (ClassNotFoundException e) {
-                throw new SQLException("MySQL JDBC Driver not found.", e);
+            } catch (ClassNotFoundException ex) {
+                throw new SQLException("MySQL JDBC Driver not found.", ex);
             }
         }
         return connection;
@@ -54,18 +72,19 @@ public class DatabaseUtil {
 
             // Create activity log table
             String createLogTable = """
-    CREATE TABLE IF NOT EXISTS activity_log (
-        id INT PRIMARY KEY AUTO_INCREMENT,
-        user_id INT,
-        action_type VARCHAR(50) NOT NULL,
-        item_id INT,
-        description TEXT,
-        timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (user_id) REFERENCES users(id),
-        FOREIGN KEY (item_id) REFERENCES inventory(id) ON DELETE CASCADE
-    )
-""";
+                CREATE TABLE IF NOT EXISTS activity_log (
+                    id INT PRIMARY KEY AUTO_INCREMENT,
+                    user_id INT,
+                    action_type VARCHAR(50) NOT NULL,
+                    item_id INT,
+                    description TEXT,
+                    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (user_id) REFERENCES users(id),
+                    FOREIGN KEY (item_id) REFERENCES inventory(id) ON DELETE CASCADE
+                )
+            """;
 
+            // Execute the creation statements
             try (PreparedStatement stmt1 = conn.prepareStatement(createUsersTable);
                  PreparedStatement stmt2 = conn.prepareStatement(createInventoryTable);
                  PreparedStatement stmt3 = conn.prepareStatement(createLogTable)) {
@@ -74,17 +93,18 @@ public class DatabaseUtil {
                 stmt2.executeUpdate();
                 stmt3.executeUpdate();
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
             throw new RuntimeException("Failed to initialize database", e);
         }
     }
 
+    // Only close the connection when the application is shutting down
     public static void closeConnection() {
         if (connection != null) {
             try {
                 connection.close();
+                connection = null;
             } catch (SQLException e) {
                 e.printStackTrace();
             }

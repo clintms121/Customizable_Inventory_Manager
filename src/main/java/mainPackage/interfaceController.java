@@ -70,6 +70,15 @@ public class interfaceController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        // Initialize the ObservableList
+        inventoryItems = FXCollections.observableArrayList();
+
+        // Create the FilteredList wrapped around the ObservableList
+        filteredItems = new FilteredList<>(inventoryItems, p -> true);
+
+        // Set the FilteredList as the TableView's items
+        inventoryTable.setItems(filteredItems);
+
         setupTable();
         setupSearch();
         setupActions();
@@ -374,18 +383,13 @@ public class interfaceController implements Initializable {
             try {
                 User currentUser = LoginController.getCurrentUser();
                 if (currentUser != null && InventoryDAO.addItem(currentUser.getId(), item)) {
-                    // Create a new ObservableList with all existing items plus the new one
-                    ObservableList<InventoryItem> newList = FXCollections.observableArrayList(inventoryItems);
-                    newList.add(item);
-                    inventoryItems = newList;
+                    // Add directly to the existing ObservableList
+                    inventoryItems.add(item);
 
-                    // Update the FilteredList with the new ObservableList
-                    filteredItems = new FilteredList<>(inventoryItems, p -> true);
-                    inventoryTable.setItems(filteredItems);
-
-                    // Apply the current search filter
+                    // Apply current search filter
                     applySearchFilter(searchField.getText());
 
+                    // Update statistics and reports
                     updateStats();
                     updateReports();
                 }
@@ -486,19 +490,16 @@ public class interfaceController implements Initializable {
             try {
                 User currentUser = LoginController.getCurrentUser();
                 if (currentUser != null && InventoryDAO.updateItem(currentUser.getId(), originalSku, updatedItem)) {
-                    // Create a new ObservableList with the updated item
-                    ObservableList<InventoryItem> newList = FXCollections.observableArrayList(inventoryItems);
-                    int index = newList.indexOf(item);
-                    newList.set(index, updatedItem);
-                    inventoryItems = newList;
+                    // Find the item in the list and update it
+                    int index = inventoryItems.indexOf(item);
+                    if (index >= 0) {
+                        inventoryItems.set(index, updatedItem);
+                    }
 
-                    // Update the FilteredList with the new ObservableList
-                    filteredItems = new FilteredList<>(inventoryItems, p -> true);
-                    inventoryTable.setItems(filteredItems);
-
-                    // Apply the current search filter
+                    // Apply current search filter
                     applySearchFilter(searchField.getText());
 
+                    // Update statistics and reports
                     updateStats();
                     updateReports();
                 }
@@ -519,18 +520,13 @@ public class interfaceController implements Initializable {
             try {
                 User currentUser = LoginController.getCurrentUser();
                 if (currentUser != null && InventoryDAO.deleteItem(currentUser.getId(), item.getSku())) {
-                    // Create a new ObservableList without the deleted item
-                    ObservableList<InventoryItem> newList = FXCollections.observableArrayList(inventoryItems);
-                    newList.remove(item);
-                    inventoryItems = newList;
+                    // Remove directly from the existing ObservableList
+                    inventoryItems.remove(item);
 
-                    // Update the FilteredList with the new ObservableList
-                    filteredItems = new FilteredList<>(inventoryItems, p -> true);
-                    inventoryTable.setItems(filteredItems);
-
-                    // Apply the current search filter
+                    // Apply current search filter
                     applySearchFilter(searchField.getText());
 
+                    // Update statistics and reports
                     updateStats();
                     updateReports();
                 }
